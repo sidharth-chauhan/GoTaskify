@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - todos_data:/app/data
+    environment:
+      - DB_PATH=/app/data/todos.db
+
+volumes:
+  todos_data:

@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"gotaskify/models"
+	"io"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -18,21 +19,38 @@ func InitializeDatabase(db *gorm.DB) {
 func GetAllTasks(w http.ResponseWriter, r *http.Request) {
 	var tasks []models.Task
 	DB.Find(&tasks)
+	response, err := json.Marshal(tasks)
+	if err != nil {
+		http.Error(w, "Error fetching tasks", http.StatusInternalServerError)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(tasks)
+	w.Write(response)
 }
 
 func CreateTask(w http.ResponseWriter, r *http.Request) {
 	var task models.Task
-	err := json.NewDecoder(r.Body).Decode(&task)
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Error reading request body", http.StatusInternalServerError)
+		return
+	}
+	err = json.Unmarshal(body, &task)
 	if err != nil {
 		http.Error(w, "Invalid JSON format", http.StatusBadRequest)
 		return
 	}
+	defer r.Body.Close()
+
 	DB.Create(&task)
+	response, err := json.Marshal(task)
+	if err != nil {
+		http.Error(w, "Error creating task", http.StatusInternalServerError)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(task)
+	w.Write(response)
 }
 
 func GetTaskById(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +63,12 @@ func GetTaskById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(task)
+	response, err := json.Marshal(task)
+	if err != nil {
+		http.Error(w, "Error fetching task", http.StatusInternalServerError)
+		return
+	}
+	w.Write(response)
 }
 
 func DeleteTask(w http.ResponseWriter, r *http.Request) {
@@ -71,12 +94,16 @@ func UpdateTask(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Task not found", http.StatusNotFound)
 		return
 	}
-	err = json.NewDecoder(r.Body).Decode(&task)
-	if err != nil {
-		http.Error(w, "Invalid JSON format", http.StatusBadRequest)
+	if task.Done {
+		http.Error(w, "Task already completed", http.StatusBadRequest)
 		return
+	} else {
+		task.Done = true
 	}
 	DB.Save(&task)
+	jsonData, _ := json.Marshal(task)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(task)
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+
 }

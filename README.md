@@ -40,7 +40,7 @@ go mod tidy
 ### ▶️ 3. Run the Application
 
 ```bash
-go run main.go
+go run .
 ```
 
 Now your API will be running at 👉 [http://localhost:8080](http://localhost:8080)
@@ -141,7 +141,7 @@ To use a custom DB path:
 
 ```bash
 export DB_PATH=your/custom/path.db
-go run main.go
+go run .
 ```
 
 ---

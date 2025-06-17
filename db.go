@@ -1,9 +1,8 @@
-// db.go
 package main
 
 import (
-	"gotaskify/models"
 	"log"
+	"os"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -11,15 +10,16 @@ import (
 
 var DB *gorm.DB
 
-func InitDB() {
-	var err error
-	DB, err = gorm.Open(sqlite.Open("/app/data/todos.db"), &gorm.Config{})
-	if err != nil {
-		log.Fatal("failed to connect database: ", err)
+func ConnectDatabase() {
+	dbPath := os.Getenv("DB_PATH") // e.g., from docker-compose or .env
+	if dbPath == "" {
+		dbPath = "data/todos.db" // default path
 	}
 
-	err = DB.AutoMigrate(&models.Task{})
+	database, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
 	if err != nil {
-		log.Fatal("failed to auto-migrate: ", err)
+		log.Fatal("Failed to connect to database:", err)
 	}
+
+	DB = database
 }

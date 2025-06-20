@@ -168,6 +168,16 @@ This project is licensed under the [MIT License](LICENSE).
 
 ---
 
+## Running Tests
+
+To run all tests:
+
+```
+go test ./test/...
+```
+
+---
+
 <p align="center">
   Made with 💙 by <a href="https://github.com/sidharthchauhan">Sidharth Chauhan</a>
 </p>

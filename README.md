@@ -175,6 +175,8 @@ To run all tests:
 ```
 go test ./test/...
 ```
+[![codecov](https://codecov.io/gh/sidharth-chauhan/GoTaskify/branch/main/graph/badge.svg)](https://codecov.io/gh/sidharth-chauhan/GoTaskify)
+
 
 ---
 

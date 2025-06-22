@@ -27,7 +27,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y docker-compose
 
       - name: 🐳 Build and deploy with Docker Compose
-        run: docker-compose up --build
+        run: docker-compose up --build -d
 
       - name: ✅ Run Go tests
         run: go test ./test/...
